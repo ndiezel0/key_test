@@ -3,16 +3,16 @@ class CreateOffers < ActiveRecord::Migration[5.1]
     create_table :offers do |t|
       # METADATA
       t.belongs_to  :company
-      t.integer     :off_id
-      t.integer     :group_id
+      t.integer     :off_id, limit: 8
+      t.integer     :group_id, limit: 8
       t.boolean     :available
-      t.string      :type
+      t.string      :ctype
 
       # Relevant Offer info
       t.string      :url
       t.integer     :price
       t.integer     :base_price
-      t.reference   :currency, index: true
+      t.references   :currency, index: true
       # Descriptive info
       t.string      :picture
       t.string      :age
@@ -29,7 +29,7 @@ class CreateOffers < ActiveRecord::Migration[5.1]
       t.boolean     :pickup
       t.boolean     :delivery
       t.string      :ordering_time
-      t.boolean     :manufacturer_warranty
+      t.string      :manufacturer_warranty
       t.integer     :local_delivery_cost
 
       t.timestamps
