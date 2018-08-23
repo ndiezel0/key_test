@@ -1,24 +1,45 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Stack
 
-Things you may want to cover:
+* Ruby 2.4
+* Rails 5.1
+* PostgreSQL 9.6+
+* RabbitMQ 3.3+
 
-* Ruby version
+## Setup
 
-* System dependencies
+    bundle
+    rails db:create
+    rails db:migrate
+    rails db:seed
+    
+## Launch
 
-* Configuration
+(required running RabbitMQ)
+    
+    rails sneakers:run
+    rails s
+    
+## Что сделано
 
-* Database creation
+* Импорт из источников данных в БД
+* Распределение нагрузки с помощью RabbitMQ
+* Распаралеллирование импорта на этапе источника и на этапе импорта товаров (25 штук на задачу)
+* Поиск по товарам с помощью full-text поиска PostgreSQL и распределение ранга в зависимости от важности
+данных: название > производитель/название модели/префикс(?) > категории > описание/доп. информация.
 
-* Database initialization
+## Что предстоит/неуспел сделать
 
-* How to run the test suite
+* Доработать отоброжение подробной информации о товаре (Сейчас отоброжаются не все что находится в БД).
+* Вывод статистики на странице импорта (не в задаче, но иначе там просто одинокая ссылка на импорт)
+* Распаралеллить импорт категорий. Скорее всего для этого понадобиться делать RPC с RabbitMQ,
+так как импорт товаров требует наличия категорий в БД.
 
-* Services (job queues, cache servers, search engines, etc.)
+## Бенчмарки
 
-* Deployment instructions
+(Ненадежные, делал один раз и с работающими бразуером и IDE в бекграунде. Скорее всего реальные результаты ниже.)
 
-* ...
+* Импорт на пустую БД: 27 секунд
+* Импорт на заполненую БД: 17 секунд
+* Поиск: 1 секунда
