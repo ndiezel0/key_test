@@ -19,4 +19,8 @@ class ImportFromSources
       @exchange.publish(id.to_s, routing_key: :update_company_queue)
     end
   end
+
+  def update_offers(msg)
+    @exchange.publish(msg, routing_key: :update_offers_queue)
+  end
 end

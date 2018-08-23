@@ -11,7 +11,7 @@ opts = {
   daemonize: Rails.env != 'development',
   start_worker_delay: 1,
   timeout_job_after: 5000,
-  workers: 4,
+  workers: 5,
   heartbeat: 5,
   metrics: Sneakers::Metrics::LoggingMetrics.new,
   pid_path: 'tmp/sneakers.pid',
@@ -24,4 +24,4 @@ opts = {
 }
 
 Sneakers.configure(opts)
-Sneakers.logger.level = Logger::INFO
+Sneakers.logger.level = Logger::WARN
