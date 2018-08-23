@@ -26,6 +26,15 @@ ActiveRecord::Schema.define(version: 20180822162805) do
     t.index ["parent_id"], name: "index_categories_on_parent_id"
   end
 
+  create_table "categories_offers", force: :cascade do |t|
+    t.bigint "category_id"
+    t.bigint "offer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_categories_offers_on_category_id"
+    t.index ["offer_id"], name: "index_categories_offers_on_offer_id"
+  end
+
   create_table "companies", force: :cascade do |t|
     t.string "name"
     t.string "company_name"
@@ -53,15 +62,6 @@ ActiveRecord::Schema.define(version: 20180822162805) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["offer_id"], name: "index_extra_infos_on_offer_id"
-  end
-
-  create_table "offer_categories", force: :cascade do |t|
-    t.bigint "offer_id"
-    t.bigint "category_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["category_id"], name: "index_offer_categories_on_category_id"
-    t.index ["offer_id"], name: "index_offer_categories_on_offer_id"
   end
 
   create_table "offers", force: :cascade do |t|

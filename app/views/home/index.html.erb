@@ -1,0 +1,16 @@
+<%= link_to 'Импортировать', imports_url %>
+<div>
+  <%= form_for :search, {url: search_offer_url, method: :post} do |f| %>
+    <%= f.text_field :search %><br>
+    <%= f.submit %>
+  <% end %>
+</div>
+
+<div>
+  <% @found_items.each do |i| %>
+  <div>
+    <%= i.name || ((i.vendor || '') + (i.model || '')) %>
+    <%= link_to 'Ссылка', item_url(id: i.id) %>
+  </div><br>
+  <% end %>
+</div>

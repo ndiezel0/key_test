@@ -52,6 +52,18 @@ class UpdateOffersJob
     offer.manufacturer_warranty = object['manufacturer_warranty'] if object['manufacturer_warranty']
     offer.local_delivery_cost =   object['local_delivery_cost'] if object['local_delivery_cost']
 
+    if object['categoryId']
+      if object['categoryId'].is_a?(Array)
+        object['categoryId'].each do |cat_id|
+          category = company.categories.where(cat_id: cat_id).first
+          offer.categories << category
+        end
+      else
+        category = company.categories.where(cat_id: object['categoryId']).first
+        offer.categories << category
+      end
+    end
+
     offer.save
     if object['param']
       object['param'].each do |param|
