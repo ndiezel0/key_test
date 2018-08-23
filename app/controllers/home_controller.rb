@@ -17,25 +17,24 @@ class HomeController < ApplicationController
     replacements = {
       ' ' => ' & '
     }
-    # TODO add ranking functionality to search
+    prepared_search = srch.gsub(Regexp.union(replacements.keys), replacements)
     result = ActiveRecord::Base.connection.exec_query("
     SELECT result
                 FROM (SELECT offers.id as result,
-                  ( to_tsvector(format('%s %s %s %s %s %s %s',
-                                        offers.name,
-                                        offers.type_prefix,
-                                        offers.vendor,
-                                        offers.model,
-                                        offers.description,
-                                        coalesce(string_agg(extra_infos.name, ' ')),
-                                        coalesce(string_agg(categories.name, ' '))
-                  )))  as document
+                  setweight(to_tsvector(format('%s', offers.name)),                                         'A') ||
+                  setweight(to_tsvector(format('%s', offers.type_prefix)),                                  'B') ||
+                  setweight(to_tsvector(format('%s', offers.vendor)),                                       'B') ||
+                  setweight(to_tsvector(format('%s', offers.model)),                                        'B') ||
+                  setweight(to_tsvector(format('%s', offers.description)),                                  'D') ||
+                  setweight(to_tsvector(format('%s', coalesce(string_agg(extra_infos.name, ' ')))),         'D') ||
+                  setweight(to_tsvector(format('%s', coalesce(string_agg(categories.name, ' ')))),          'C')  as document
           FROM offers
           LEFT OUTER JOIN extra_infos ON extra_infos.offer_id = offers.id
           LEFT OUTER JOIN categories_offers ON categories_offers.offer_id = offers.id
           LEFT OUTER JOIN categories ON categories.id = categories_offers.category_id
           GROUP BY offers.id) o_search
-    WHERE o_search.document @@ to_tsquery('#{srch.gsub(Regexp.union(replacements.keys), replacements)}')
+    WHERE o_search.document @@ to_tsquery('#{prepared_search}')
+    ORDER BY ts_rank(o_search.document, to_tsquery('#{prepared_search}')) DESC;
   ")
     result = result.rows.map { |i| i[0] }
     result = Offer.find(result)
