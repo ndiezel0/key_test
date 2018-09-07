@@ -1,13 +1,13 @@
-require 'sneakers'
+require_relative 'update_offers'
 
 class UpdateCompanyJob
-  include Sneakers::Worker
-  from_queue 'update_company_queue'
+  include Backburner::Queue
+  queue 'company-update'
+  queue_priority 100
 
-  def work(msg)
+  def self.perform(msg)
     # puts 'update company ' + msg
-    puts msg + ' ' + ((Time.now.to_f * 1000.0).to_i).to_s
-    msg = msg.to_i
+    puts msg.to_s + ' ' + ((Time.now.to_f * 1000.0).to_i).to_s
     source = Source.where(id: msg).first
     if source
       response = HTTParty.get(source.url,
@@ -25,12 +25,11 @@ class UpdateCompanyJob
     else
       puts 'No source was found with id: ' + msg
     end
-    ack!
+    # ack!
   end
 
-  private
 
-  def update_company(source, object)
+  def self.update_company(source, object)
     company = source.company
     unless company
       company = Company.new
@@ -46,17 +45,18 @@ class UpdateCompanyJob
     object['categories']['category'].each do |category|
       update_category(company, category)
     end
-    object['offers']['offer'].each_slice(25) do |offers|
+    object['offers']['offer'].each_slice(5) do |offers|
       msg = {
         id: company.id,
         offers: offers
       }
-      ImportFromSources.instance.update_offers(msg.to_json)
+      # byebug
+      Backburner.enqueue UpdateOffersJob, msg
     end
     puts company.name + ' ended updating'
   end
 
-  def update_category(company, object)
+  def self.update_category(company, object)
     category_id = object['id'].to_i
     category = company.categories.where(cat_id: category_id).first
     unless category
@@ -75,7 +75,7 @@ class UpdateCompanyJob
     # byebug
   end
 
-  def update_offer(company, object)
+  def self.update_offer(company, object)
     offer_id = object['id'].to_i
     offer = company.offers.where(off_id: offer_id).first
     unless offer
@@ -116,7 +116,7 @@ class UpdateCompanyJob
     end
   end
 
-  def update_extra_info(offer, object)
+  def self.update_extra_info(offer, object)
     key = object['name']
     extra_info = offer.extra_infos.where(name: key).first
     unless extra_info
@@ -128,7 +128,7 @@ class UpdateCompanyJob
     extra_info.save
   end
 
-  def to_bool(str)
+  def self.to_bool(str)
     ActiveModel::Type::Boolean.new.cast(str)
   end
 end

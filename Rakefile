@@ -3,5 +3,6 @@
 
 require_relative 'config/application'
 require 'sneakers/tasks'
+require 'backburner/tasks'
 
 Rails.application.load_tasks

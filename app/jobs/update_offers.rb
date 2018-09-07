@@ -1,12 +1,19 @@
-require 'sneakers'
+require_dependency '../models/company'
+require_dependency '../models/category'
+require_dependency '../models/currency'
+require_dependency '../models/extra_info'
+require_dependency '../models/offer'
+require_dependency '../models/offer_category'
+require_dependency '../models/source'
+
 
 class UpdateOffersJob
-  include Sneakers::Worker
-  from_queue 'update_offers_queue'
+  include Backburner::Queue
+  queue 'offers-update'
+  queue_priority 100
 
-  def work(msg)
+  def self.perform(msg)
     # puts 'update offers'
-    msg = JSON.parse(msg)
     company = Company.find_by_id(msg['id'])
     if company
       msg['offers'].each do |offer|
@@ -14,12 +21,11 @@ class UpdateOffersJob
       end
     end
     puts company.source.id.to_s + ' ' + ((Time.now.to_f * 1000.0).to_i).to_s
-    ack!
+    # ack!
   end
 
-  private
 
-  def update_offer(company, object)
+  def self.update_offer(company, object)
     offer_id = object['id'].to_i
     offer = company.offers.where(off_id: offer_id).first
     unless offer
@@ -72,7 +78,7 @@ class UpdateOffersJob
     end
   end
 
-  def update_extra_info(offer, object)
+  def self.update_extra_info(offer, object)
     key = object['name']
     extra_info = offer.extra_infos.where(name: key).first
     unless extra_info
@@ -84,7 +90,7 @@ class UpdateOffersJob
     extra_info.save
   end
 
-  def to_bool(str)
+  def self.to_bool(str)
     ActiveModel::Type::Boolean.new.cast(str)
   end
 end

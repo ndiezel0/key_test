@@ -42,6 +42,10 @@ gem 'bunny'
 # Using HTTParty to get YML from servers
 gem 'httparty'
 
+gem 'backburner', '~> 1.4', '>= 1.4.1'
+
+gem 'beaneater'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

@@ -42,6 +42,11 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     amq-protocol (2.3.0)
     arel (8.0.0)
+    backburner (1.4.1)
+      beaneater (~> 1.0)
+      concurrent-ruby (~> 1.0.1)
+      dante (> 0.1.5)
+    beaneater (1.0.0)
     bindex (0.5.0)
     builder (3.2.3)
     bunny (2.9.2)
@@ -65,6 +70,7 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
+    dante (0.2.0)
     erubi (1.7.1)
     execjs (2.7.0)
     ffi (1.9.25)
@@ -189,6 +195,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  backburner (~> 1.4, >= 1.4.1)
+  beaneater
   bunny
   byebug
   capybara (~> 2.13)
@@ -210,4 +218,4 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 BUNDLED WITH
-   1.16.1
+   1.16.4
